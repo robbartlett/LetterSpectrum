@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block mainContentSection %}
+
+<div id="colorizer"></div>
+	
+<script type="text/jsx">
+     /*** @jsx React.DOM */
+     //TODO: Need to grok state
+	var ListItemWrapper = React.createClass({
+	 	render: function() {
+	 		var color = "#" + this.props.c;
+	 		var liStyle = {
+	 			fontSize: "16px",
+	 			fontWeight: "bold",
+				color: color,
+				display:"inline",
+				listStyleType: "none",
+				paddingRight:"10px",
+				"float":"left"
+			};
+			//TODO: Consider increasing font size for higher counts
+			//TODO: Heat Map?
+			if (this.props.l == " "){
+				this.props.l = "[SPACE]";
+			}
+			if (this.props.l == "\t"){
+				this.props.l = "[TAB]";
+			}
+			if (this.props.l.trim() == ""){ //other unicode - maybe a better way?
+				this.props.l = "[&#" + this.props.l.charCodeAt(0) + ";]";
+			}
+			
+	    	return <li style={liStyle}>{this.props.l}:{this.props.n}</li>;
+	  	}
+	});
+
+
+    var ColorizedBlock = React.createClass({
+    	getInitialState: function() {
+    		//Is this method strictly necessary?
+		    return { value: {rawText: "", colorData:[]}};
+	    },
+	    componentWillMount: function(){
+            this.setState({value: this.state.value});
+        },
+	    componentDidMount: function() {
+	    	var data = {
+	    		t: this.state.value.rawText
+	    	};
+
+		    this.serverRequest = $.post(this.props.source, data, function (result) {
+		      this.setState({value: { rawText:"", colorData: result}});
+		    }.bind(this));
+		},
+		colorize: function(){
+			var data = {
+	    		t: this.state.value.rawText
+	    	};
+	    	console.log(data.t);
+		    this.serverRequest = $.post(this.props.source, data, function (result) {
+		      this.setState({value: { rawText:"", colorData: result}}); {/* Why doesn't this update the textbox? */}
+		      $("[name=textToColorize]").val("");
+		    }.bind(this));
+		    return false;
+		},
+		handleTextChange: function(event) {
+			//TODO: Investigate 2-way binding
+			var stateValue = this.state.value
+			stateValue.rawText = event.target.value
+    		this.setState({ value: stateValue});
+  		},
+        render: function() {
+        	var results = this.state.value.colorData;
+        	return (<div>
+	        		<div className="jumbotron">
+						<form id="textForm"  role="form" method="post" onSubmit={this.colorize}>
+							<div className="form-group"> 
+					    		<input type="text" name="textToColorize" className="form-control" placeholder="text to colorize"
+					    		value={this.state.rawText}
+					    		onChange={this.handleTextChange} />
+					    	</div>
+					    	<button type="button" className="btn btn-lg btn-primary" onClick={this.colorize}>Colorize!</button>
+					    </form>
+					</div>
+					{/*TODO: Add a conditional no-results message */}
+				    <div id="colorizedText">
+				    	<ul>
+		        			{results.map(function(result) {
+		        				return <ListItemWrapper key={result.l} l={result.l} c={result.c} n={result.n} />;
+		        			})}
+	      				</ul>
+				    </div>
+			    </div>
+      		);
+        }
+    });
+
+    React.render(<ColorizedBlock source='/colorize'/>, document.getElementById('colorizer') );
+</script>
+
+{% endblock %}

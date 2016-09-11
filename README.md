@@ -1,0 +1,41 @@
+LetterSpectrum
+=========
+
+A simple exercise of Python, Flask, SQLite, and React
+
+This is a project for learning and experimentation
+
+Original Concept:
+Develop a web application which contains a page that allows the user to enter a string of characters.
+When the user submits the input, take each character and display a color to represent the character.
+So if the user submits &quot;Hello World&quot; they would see a series of 11 color shapes (1 for each character,
+including the space).
+
+Additionally, keep track of the characters entered so far and allow a user to see the number of times
+each character was submitted to the system. This value is a cumulative total for all users, so it will add
+up as more and more users access this system.
+
+Installation
+------------
+
+Install Python.
+Install Pip
+Install virtualenv
+
+$ virtualenv flask
+
+Install the flask extensions (Win use backslash):
+
+$ flask/bin/pip install flask
+$ flask/bin/pip install flask-sqlalchemy
+$ flask/bin/pip install sqlalchemy-migrate
+$ flask/bin/pip install flask-whooshalchemy
+$ flask/bin/pip install flask-babel
+$ flask/bin/pip install coverage
+
+
+Running
+-------
+
+To run the application in the development web server just execute `run.py` with the Python interpreter from the flask virtual environment.
+
