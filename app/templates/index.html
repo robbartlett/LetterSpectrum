@@ -29,8 +29,11 @@
 			if (this.props.l.trim() == ""){ //other unicode - maybe a better way?
 				this.props.l = "[&#" + this.props.l.charCodeAt(0) + ";]";
 			}
-			
-	    	return <li style={liStyle}>{this.props.l}:{this.props.n}</li>;
+			if (this.props.n){
+				return <li style={liStyle}>{this.props.l}:{this.props.n}</li>;	
+			} else {
+	    		return <li style={liStyle}>{this.props.l}</li>;
+	    	}
 	  	}
 	});
 
@@ -38,7 +41,7 @@
     var ColorizedBlock = React.createClass({
     	getInitialState: function() {
     		//Is this method strictly necessary?
-		    return { value: {rawText: "", colorData:[]}};
+		    return { value: {rawText: "", colorData:[], myColors:[]}};
 	    },
 	    componentWillMount: function(){
             this.setState({value: this.state.value});
@@ -49,7 +52,7 @@
 	    	};
 
 		    this.serverRequest = $.post(this.props.source, data, function (result) {
-		      this.setState({value: { rawText:"", colorData: result}});
+		      this.setState({value: { rawText:"", colorData: result, myColors:[]}});
 		    }.bind(this));
 		},
 		colorize: function(){
@@ -58,7 +61,14 @@
 	    	};
 	    	console.log(data.t);
 		    this.serverRequest = $.post(this.props.source, data, function (result) {
-		      this.setState({value: { rawText:"", colorData: result}}); {/* Why doesn't this update the textbox? */}
+		    	myColors = [];
+		    	for (var i = 0, len = data.t.length; i < len; i++) {
+		    		var c = $.grep(result, function(e){ 
+		    			return (e.l == data.t[i])
+		    		})[0].c;
+				 	myColors.push({l:data.t[i], c:c, k:data.t[i]+c+i});
+				}
+		      	this.setState({value: { rawText:"", colorData: result, myColors:myColors}}); {/* Why doesn't this update the textbox? */}
 		      $("[name=textToColorize]").val("");
 		    }.bind(this));
 		    return false;
@@ -71,6 +81,9 @@
   		},
         render: function() {
         	var results = this.state.value.colorData;
+        	var myResults = this.state.value.myColors;
+        	var myResultsVisible = !!myResults; {/*TODO: Add a conditional no-results message */}
+
         	return (<div>
 	        		<div className="jumbotron">
 						<form id="textForm"  role="form" method="post" onSubmit={this.colorize}>
@@ -80,10 +93,21 @@
 					    		onChange={this.handleTextChange} />
 					    	</div>
 					    	<button type="button" className="btn btn-lg btn-primary" onClick={this.colorize}>Colorize!</button>
+
 					    </form>
 					</div>
+					<div id="myColors">
+			    		<label>My Colors:</label>
+			    		<ul>
+		        			{myResults.map(function(result) {
+		        				return <ListItemWrapper key={result.k} l={result.l} c={result.c} />;
+		        			})}
+	      				</ul>		
+			    	</div>
+			    	<br/>
 					{/*TODO: Add a conditional no-results message */}
 				    <div id="colorizedText">
+				    	<label>All Colors:</label>
 				    	<ul>
 		        			{results.map(function(result) {
 		        				return <ListItemWrapper key={result.l} l={result.l} c={result.c} n={result.n} />;
