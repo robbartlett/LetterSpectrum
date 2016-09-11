@@ -22,31 +22,37 @@ Assumptions
 * Colors can repeat
 * Colors are persisted, so they show up the same for each letter every time
 * "Color Shape" refers just to some visual representation of the character
-* "Users" are anonymous (no need to track user-specific entriesre)
+* "Users" are anonymous (no need to track user-specific entries)
 * Scalability isn't a factor
 * There is no need for near-real-time updates from one user to the next: positive action (click) is satisfactory
+* It isn't entirely clear if the list of ALL numbers
 
 Installation
 ------------
 
 Install Python.
-Install Pip
-Install virtualenv
 
+Install Pip.
+
+Install virtualenv.
+
+```
 $ virtualenv flask
+```
 
 Install the flask extensions (Win use backslash):
 
+```
 $ flask/bin/pip install flask
 $ flask/bin/pip install flask-sqlalchemy
 $ flask/bin/pip install sqlalchemy-migrate
 $ flask/bin/pip install flask-whooshalchemy
 $ flask/bin/pip install flask-babel
 $ flask/bin/pip install coverage
+```
 
 
 Running
 -------
 
 To run the application in the development web server execute `run.py` with the Python interpreter from the flask virtual environment.
-
